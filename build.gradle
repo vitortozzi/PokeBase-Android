@@ -1,5 +1,10 @@
 buildscript {
+
+    // Dependency versions
     ext.hilt_version = '2.40'
+    ext.retrofit_version = '2.9.0'
+    ext.lottieVersion = "3.4.0"
+
     repositories {
         google()
         mavenCentral()

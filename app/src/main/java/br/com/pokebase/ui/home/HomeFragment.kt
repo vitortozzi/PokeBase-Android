@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import br.com.pokebase.databinding.FragmentHomeBinding
+import br.com.pokebase.ui.home.adapter.SimplePokemonAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,11 +30,37 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        val textView: TextView = binding.textHome
         viewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
         }
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupObservers()
+    }
+
+    private fun setupObservers() {
+        viewModel.viewState.observe(viewLifecycleOwner) {
+            when (it) {
+                is PokeBaseHomeViewState.Error -> TODO()
+                PokeBaseHomeViewState.Loading -> showLoading()
+                is PokeBaseHomeViewState.PokemonsLoaded -> {
+                    hideLoading()
+                    val adapter = SimplePokemonAdapter()
+                    adapter.pokemons = it.pokemons
+                    binding.recycler.adapter = adapter
+                }
+            }
+        }
+    }
+
+    private fun hideLoading() {
+        binding.animationView.visibility = View.GONE
+    }
+
+    private fun showLoading() {
+        binding.animationView.visibility = View.VISIBLE
     }
 
     override fun onDestroyView() {

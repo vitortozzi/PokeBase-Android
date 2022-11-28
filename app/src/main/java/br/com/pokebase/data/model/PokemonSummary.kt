@@ -15,7 +15,19 @@ data class PokemonDetail(
     val id: Int,
     val name: String,
     @SerializedName("sprites")
-    val sprite: Sprite
+    val sprite: Sprite,
+    val types: List<PokemonTypeItem>
+)
+
+data class PokemonTypeItem (
+    val slot: Int,
+    val type: PokemonType
+)
+
+data class PokemonType (
+    @SerializedName("name")
+    val typeEnum: TypeEnum,
+    val url: String
 )
 
 data class Sprite(
@@ -29,3 +41,24 @@ data class SpriteOther(
     @SerializedName("official-artwork")
     val officialArtwork: Sprite
 )
+
+enum class TypeEnum {
+    normal,
+    fire,
+    water,
+    electric,
+    grass,
+    ice,
+    fighting,
+    poison,
+    ground,
+    flying,
+    psychic,
+    bug,
+    rock,
+    ghost,
+    dragon,
+    dark,
+    steel,
+    fairy
+}

@@ -18,6 +18,7 @@
 .idea/runConfigurations.xml
 .idea/deviceManager.xml
 .idea/misc.xml
+.idea/planningMode.xml
 
 # Project specific
 GEMINI.md

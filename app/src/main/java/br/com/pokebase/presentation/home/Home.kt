@@ -1,7 +1,8 @@
-package br.com.pokebase.ui.home
+package br.com.pokebase.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,34 +17,61 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import br.com.pokebase.capitalizeName
-import br.com.pokebase.data.model.PokemonDetail
-import br.com.pokebase.data.model.PokemonTypeItem
+import br.com.pokebase.domain.model.PokemonDetail
+import br.com.pokebase.domain.model.PokemonTypeItem
 import coil.compose.AsyncImage
 
 @Composable
-fun HomeRoute(viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeRoute(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
-    HomeScreen(uiState)
+    HomeScreen(
+        uiState = uiState,
+        onRetry = {viewModel.loadCatalog()},
+        modifier = modifier
+    )
 }
 
 @Composable
-fun HomeScreen(uiState: HomeUiState) {
-    Box(modifier = Modifier.fillMaxSize()) {
+fun HomeScreen(
+    uiState: HomeUiState,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else if (uiState.errorMessage != null) {
-            Text(
-                text = uiState.errorMessage,
-                modifier = Modifier.align(Alignment.Center),
-                color = MaterialTheme.colorScheme.error
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = uiState.errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+                Button(
+                    onClick = onRetry
+                ) {
+                    Text("Try Again")
+                }
+            }
         } else {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(uiState.pokemons) { pokemon ->
+                items(
+                    uiState.pokemons, key = {
+                        it.id
+                    }) { pokemon ->
                     PokemonItem(pokemon)
                 }
             }
@@ -77,7 +105,7 @@ fun PokemonItem(pokemon: PokemonDetail) {
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = pokemon.sprite.otherSprites.officialArtwork.frontDefault,
+                    model = pokemon.sprite?.otherSprites?.officialArtwork?.frontDefault,
                     contentDescription = pokemon.name,
                     modifier = Modifier.size(80.dp)
                 )

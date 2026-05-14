@@ -1,9 +1,9 @@
-package br.com.pokebase.ui.home
+package br.com.pokebase.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.pokebase.api.Repository
-import br.com.pokebase.data.model.PokemonDetail
+import br.com.pokebase.domain.PokemonCatalogRepository
+import br.com.pokebase.domain.model.PokemonDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,20 +20,21 @@ data class HomeUiState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: Repository
+    private val repository: PokemonCatalogRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
-        reloadPokemons()
+        loadCatalog()
     }
 
-    fun reloadPokemons() {
+    fun loadCatalog() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
+                //TODO: fixed offset and limit for tests porpuses. Need to improve it
                 val pokeDetails = repository.getPokemons(151, 0)
                 _uiState.update { it.copy(isLoading = false, pokemons = pokeDetails) }
             } catch (e: Exception) {

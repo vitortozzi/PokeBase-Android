@@ -1,10 +1,13 @@
-package br.com.pokebase.api
+package br.com.pokebase.data.di
 
+import br.com.pokebase.data.remote.ApiService
+import br.com.pokebase.data.repository.PokemonCatalogRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -26,8 +29,8 @@ object ApiModule {
     @Singleton
     @Provides
     fun providesOkHttpClient(): OkHttpClient =
-        OkHttpClient
-            .Builder()
+        OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
             .build()
 
     @Singleton
@@ -36,5 +39,5 @@ object ApiModule {
 
     @Singleton
     @Provides
-    fun providesRepository(apiService: ApiService) = Repository(apiService)
+    fun providesRepository(apiService: ApiService) = PokemonCatalogRepositoryImpl(apiService)
 }

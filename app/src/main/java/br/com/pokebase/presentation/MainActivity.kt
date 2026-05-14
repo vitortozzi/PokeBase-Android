@@ -1,4 +1,4 @@
-package br.com.pokebase
+package br.com.pokebase.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,9 +21,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import br.com.pokebase.ui.dashboard.DashboardScreen
-import br.com.pokebase.ui.home.HomeRoute
-import br.com.pokebase.ui.notifications.NotificationsScreen
+import br.com.pokebase.R
+import br.com.pokebase.presentation.home.HomeRoute
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,14 +40,12 @@ class MainActivity : ComponentActivity() {
 
 private sealed class Screen(val route: String, val labelRes: Int, val iconRes: Int) {
     object Home : Screen("home", R.string.title_pokedex, R.drawable.ic_pokedex)
-    object Dashboard : Screen("dashboard", R.string.title_dashboard, R.drawable.ic_dashboard_black_24dp)
-    object Notifications : Screen("notifications", R.string.title_notifications, R.drawable.ic_notifications_black_24dp)
 }
 
 @Composable
 private fun MainScreen() {
     val navController = rememberNavController()
-    val items = listOf(Screen.Home, Screen.Dashboard, Screen.Notifications)
+    val items = listOf(Screen.Home)
 
     Scaffold(
         bottomBar = {
@@ -85,8 +82,6 @@ private fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { HomeRoute() }
-            composable(Screen.Dashboard.route) { DashboardScreen() }
-            composable(Screen.Notifications.route) { NotificationsScreen() }
         }
     }
 }

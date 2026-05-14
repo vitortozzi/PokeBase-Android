@@ -16,6 +16,7 @@
 .idea/compiler.xml
 .idea/inspectionProfiles/
 .idea/runConfigurations.xml
+.idea/deviceManager.xml
 
 # Project specific
 GEMINI.md

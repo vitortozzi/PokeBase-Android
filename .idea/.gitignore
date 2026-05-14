@@ -1,0 +1,18 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/tasks.xml
+/dictionaries
+/libraries
+/caches
+/modules.xml
+/navEditor.xml
+/assetWizardSettings.xml
+/deploymentTargetSelector.xml
+/studiobot.xml
+/AndroidProjectSystem.xml
+/migrations.xml
+/.name
+/compiler.xml
+/inspectionProfiles/
+/runConfigurations.xml

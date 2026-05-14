@@ -1,20 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
-    id 'kotlin-kapt'
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
 
 android {
-    compileSdk 36
+    compileSdk 37
 
     namespace "br.com.pokebase"
 
     defaultConfig {
         applicationId "br.com.pokebase"
         minSdk 24
-        targetSdk 36
+        targetSdk 37
         versionCode 1
         versionName "1.0"
 
@@ -24,10 +23,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
     }
 
     buildFeatures {
@@ -62,7 +57,6 @@ dependencies {
     implementation libs.androidx.material3
     implementation libs.androidx.activity.compose
     implementation libs.androidx.lifecycle.viewmodel.compose
-    implementation libs.coil.compose
     implementation libs.androidx.navigation.compose
     implementation libs.hilt.navigation.compose
 
@@ -73,9 +67,9 @@ dependencies {
 
     // Hilt
     implementation libs.hilt.android
-    kapt libs.hilt.android.compiler
+    ksp libs.hilt.android.compiler
     implementation libs.hilt.navigation.compose
-    kapt libs.hilt.compiler
+    ksp libs.hilt.compiler
 
     //Gson
     implementation libs.gson
@@ -85,7 +79,10 @@ dependencies {
     implementation libs.retrofit.converter.gson
     implementation libs.okhttp.logging.interceptor
 
-    // Coil
+    // Coil 3
+    implementation platform(libs.coil.bom)
+    implementation libs.coil.compose
+    implementation libs.coil.network.okhttp
     implementation libs.coil
 
     // Lottie

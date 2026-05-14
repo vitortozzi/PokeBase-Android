@@ -19,7 +19,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import br.com.pokebase.capitalizeName
 import br.com.pokebase.domain.model.PokemonDetail
 import br.com.pokebase.domain.model.PokemonTypeItem
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 
 @Composable
 fun HomeRoute(

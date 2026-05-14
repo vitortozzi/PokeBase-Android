@@ -11,6 +11,7 @@ class PokemonCatalogRepositoryImpl @Inject constructor(
 ) : PokemonCatalogRepository {
     override suspend fun getPokemons(limit: Int, offset: Int): List<PokemonDetail> {
         val response = apiService.getPokemonList(limit, offset)
+        //TODO: This is by far not performatic. I will be migrating this to a better solution on the next days
         return response.results.map {
             apiService.getPokemonDetail(it.name).toDomain()
         }

@@ -1,7 +1,6 @@
 package br.com.pokebase.data.di
 
 import br.com.pokebase.data.remote.ApiService
-import br.com.pokebase.data.repository.PokemonCatalogRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,8 +35,4 @@ object ApiModule {
     @Singleton
     @Provides
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
-
-    @Singleton
-    @Provides
-    fun providesRepository(apiService: ApiService) = PokemonCatalogRepositoryImpl(apiService)
 }

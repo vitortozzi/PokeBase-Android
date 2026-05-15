@@ -8,15 +8,10 @@ PokéBase is a digital Pokédex that provides a rich, interactive experience for
 ## 📸 Preview
 
 <div align="center">
-  <img src="screenshots/home.png" width="300" alt="Home Screen">
+  <img src="screenshots/home.gif" width="300" alt="Home Screen">
   <br>
-  <i>Home Screen Overview</i>
+  <i>App Demo with smooth transitions and animations</i>
 </div>
-
-### 🎬 Experience the App
-Check out the app in action, featuring smooth Lottie animations and Jetpack Compose transitions:
-
-[**Watch the Screen Recording**](screenshots/home_recording.mp4)
 
 ---
 

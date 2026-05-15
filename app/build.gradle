@@ -96,8 +96,7 @@ dependencies {
     implementation platform(libs.coil.bom)
     implementation libs.coil.compose
     implementation libs.coil.network.okhttp
-    implementation libs.coil
 
     // Lottie
-    implementation libs.lottie
+    implementation libs.lottie.compose
 }

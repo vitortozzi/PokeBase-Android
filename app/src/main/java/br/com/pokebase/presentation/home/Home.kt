@@ -20,6 +20,11 @@ import br.com.pokebase.capitalizeName
 import br.com.pokebase.domain.model.PokemonDetail
 import br.com.pokebase.domain.model.PokemonTypeItem
 import coil3.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import br.com.pokebase.R
 
 @Composable
 fun HomeRoute(
@@ -42,7 +47,14 @@ fun HomeScreen(
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.pokeball_loading_animation))
+            LottieAnimation(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.Center)
+            )
         } else if (uiState.errorMessage != null) {
             Column(
                 modifier = Modifier

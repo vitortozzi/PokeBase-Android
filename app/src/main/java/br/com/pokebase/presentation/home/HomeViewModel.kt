@@ -35,8 +35,9 @@ class HomeViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 //TODO: fixed offset and limit for tests purposes. Need to improve it
-                val pokeDetails = catalogUseCase.getPokemonCatalog(151, 0)
-                _uiState.update { it.copy(isLoading = false, pokemons = pokeDetails) }
+                catalogUseCase.getPokemonCatalog(151, 0).collect { pokemonList ->
+                    _uiState.update { it.copy(isLoading = false, pokemons = pokemonList) }
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }
             }

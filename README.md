@@ -21,20 +21,22 @@ Check out the app in action, featuring smooth Lottie animations and Jetpack Comp
 ---
 
 ## ✨ Features
-- **Efficient Data Fetching:** Utilizes **GraphQL** via **Apollo Kotlin** to fetch only the necessary data from the [PokeAPI](https://pokeapi.co/), reducing over-fetching and improving performance.
+- **Offline-First Experience:** Uses a **Single Source of Truth (SSOT)** strategy. The UI observes a local database, ensuring instant access to data even without an internet connection.
+- **Smart Caching:** Implements a cache expiration logic (24h timeout) to balance data freshness and network/battery efficiency.
+- **Efficient Data Fetching:** Utilizes **GraphQL** via **Apollo Kotlin** to fetch only the necessary data from the [PokeAPI](https://pokeapi.co/), significantly improving performance over traditional REST.
 - **Modern UI:** Built using **Jetpack Compose** for a declarative and responsive interface.
 - **Fluid Animations:** Integrated **Lottie** animations for an engaging "Pokéball" loading experience.
 - **Clean Architecture:** Separated into Data, Domain, and Presentation layers for maximum maintainability and testability.
-- **Image Caching:** Leverages **Coil 3** for efficient image loading and memory management.
 
 ---
 
 ## 🛠 Tech Stack & Tools
-- **Language:** Kotlin (with Built-in Kotlin support in AGP 9)
+- **Language:** Kotlin
 - **UI:** Jetpack Compose & Material 3
 - **Architecture:** MVVM + Clean Architecture (UseCases/Interactors)
-- **Dependency Injection:** Hilt (using KSP for faster compilation)
+- **Local Database:** **Room** (with Coroutines/Flow support)
 - **Networking:** Apollo GraphQL 5, Retrofit 3 & OkHttp 5
+- **Dependency Injection:** Hilt (using KSP for faster compilation)
 - **Concurrency:** Kotlin Coroutines & Flow
 - **Animations:** Lottie for Android
 - **Build System:** Gradle 9.5.1 + Android Gradle Plugin 9.2.1
@@ -43,9 +45,11 @@ Check out the app in action, featuring smooth Lottie animations and Jetpack Comp
 
 ## 🏗 Architecture Overview
 The project follows **Clean Architecture** principles to ensure separation of concerns:
-- **Presentation:** UI components (Compose) and ViewModels using `StateFlow` to manage UI state.
+- **Presentation:** UI components (Compose) and ViewModels using `StateFlow` to manage reactive UI states.
 - **Domain:** Business logic defined in **UseCases** and repository interfaces (Pure Kotlin).
-- **Data:** Implementation of repositories, GraphQL services (Apollo), REST API (Retrofit), and Data Mappers.
+- **Data:** 
+    - **Single Source of Truth:** Orchestrated by Repositories that sync Remote data (**Apollo/GraphQL**) into the Local database (**Room**).
+    - **Mappers:** Transform Data entities and DTOs into clean Domain models.
 
 ---
 

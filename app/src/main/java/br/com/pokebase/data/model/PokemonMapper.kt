@@ -2,18 +2,6 @@ package br.com.pokebase.data.model
 
 import br.com.pokebase.domain.model.*
 
-fun PokemonSummaryModel.toDomain() = PokemonSummary(
-    name = name,
-    url = url
-)
-
-fun PokemonDetailModel.toDomain() = PokemonDetail(
-    id = id,
-    name = name,
-    sprite = sprite?.toDomain(),
-    types = types?.map { it.toDomain() }.orEmpty()
-)
-
 fun PokemonTypeItemModel.toDomain() = PokemonTypeItem(
     slot = slot,
     type = type.toDomain()
@@ -36,3 +24,23 @@ fun SpriteOtherModel.toDomain() = SpriteOther(
 )
 
 fun TypeEnumModel.toDomain() = TypeEnum.valueOf(this.name)
+
+fun PokemonEntity.toDomain() = PokemonDetail(
+    id = id,
+    name = name,
+    sprite = Sprite(
+        frontDefault = null,
+        otherSprites = SpriteOther(
+            officialArtwork = SpriteArtwork(frontDefault = imageUrl)
+        )
+    ),
+    types = types.split(",").filter { it.isNotEmpty() }.mapIndexed { index, typeName ->
+        PokemonTypeItem(
+            slot = index + 1,
+            type = PokemonType(
+                typeEnum = TypeEnum.valueOf(typeName),
+                url = ""
+            )
+        )
+    }
+)

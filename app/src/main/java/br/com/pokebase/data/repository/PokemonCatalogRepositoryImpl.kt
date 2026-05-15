@@ -1,46 +1,72 @@
 package br.com.pokebase.data.repository
 
 import br.com.pokebase.GetPokemonListQuery
+import br.com.pokebase.data.local.PokemonDao
+import br.com.pokebase.data.model.PokemonEntity
 import br.com.pokebase.data.model.SpriteModel
+import br.com.pokebase.data.model.TypeEnumModel
 import br.com.pokebase.data.model.toDomain
 import br.com.pokebase.domain.PokemonCatalogRepository
 import br.com.pokebase.domain.model.PokemonDetail
-import br.com.pokebase.domain.model.PokemonType
-import br.com.pokebase.domain.model.PokemonTypeItem
-import br.com.pokebase.domain.model.Sprite
-import br.com.pokebase.domain.model.TypeEnum
 import com.apollographql.apollo.ApolloClient
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class PokemonCatalogRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient,
-    private val gson: Gson
+    private val gson: Gson,
+    private val pokemonDao: PokemonDao,
 ) : PokemonCatalogRepository {
-    override suspend fun getPokemons(limit: Int, offset: Int): List<PokemonDetail> {
-        val response = apolloClient.query(GetPokemonListQuery(limit = limit, offset = offset)).execute()
-        return response.data?.pokemon?.map {
-            PokemonDetail(
-                id = it.id,
-                name = it.name,
-                types = it.pokemontypes.map { type -> PokemonTypeItem(
-                    slot = type.slot,
-                    type = PokemonType(
-                        typeEnum = TypeEnum.valueOf(type.type?.name ?: TypeEnum.normal.name),
-                        url = ""
-                    )
-                ) 
-                },
-                sprite = mapSprite(it.pokemonsprites.firstOrNull()?.sprites)
-            )
-        } ?: emptyList()
-        
+
+    private val CACHE_TIMEOUT = 24 * 60 * 60 * 1000L
+
+    override suspend fun getPokemons(limit: Int, offset: Int): Flow<List<PokemonDetail>> {
+        val count = pokemonDao.getCount()
+        val lastUpdate = pokemonDao.getLastUpdateTimestamp() ?: 0L
+        val isExpired = System.currentTimeMillis() - lastUpdate > CACHE_TIMEOUT
+
+        if (count < (offset + limit) || isExpired) {
+            fetchAndSavePokemons(limit, offset)
+        }
+
+        return pokemonDao.getAll().map { entities ->
+            entities.map { it.toDomain() }
+        }
     }
 
-    private fun mapSprite(spritesJson: Any?): Sprite? {
+    private suspend fun fetchAndSavePokemons(limit: Int, offset: Int) {
+        try {
+            val response = apolloClient.query(GetPokemonListQuery(limit = limit, offset = offset)).execute()
+            val pokemonList = response.data?.pokemon ?: emptyList()
+
+            val entities = pokemonList.map {
+                PokemonEntity(
+                    id = it.id,
+                    name = it.name,
+                    imageUrl = it.pokemonsprites.firstOrNull()?.sprites?.let { spritesJson ->
+                        val spriteModel = mapSprite(spritesJson)
+                        spriteModel?.otherSprites?.officialArtwork?.frontDefault
+                    },
+                    types = it.pokemontypes.joinToString(",") { type ->
+                        type.type?.name ?: TypeEnumModel.normal.name
+                    }
+                )
+            }
+
+            if (entities.isNotEmpty()) {
+                pokemonDao.insertAll(entities)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun mapSprite(spritesJson: Any?): SpriteModel? {
         return try {
             val jsonString = gson.toJson(spritesJson)
-            gson.fromJson(jsonString, SpriteModel::class.java).toDomain()
+            gson.fromJson(jsonString, SpriteModel::class.java)
         } catch (_: Exception) {
             null
         }

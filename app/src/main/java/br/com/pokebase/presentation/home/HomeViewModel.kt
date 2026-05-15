@@ -2,7 +2,7 @@ package br.com.pokebase.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.pokebase.domain.PokemonCatalogRepository
+import br.com.pokebase.domain.PokemonCatalogUseCase
 import br.com.pokebase.domain.model.PokemonDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ data class HomeUiState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: PokemonCatalogRepository
+    private val catalogUseCase: PokemonCatalogUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -34,8 +34,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                //TODO: fixed offset and limit for tests porpuses. Need to improve it
-                val pokeDetails = repository.getPokemons(151, 0)
+                //TODO: fixed offset and limit for tests purposes. Need to improve it
+                val pokeDetails = catalogUseCase.getPokemonCatalog(151, 0)
                 _uiState.update { it.copy(isLoading = false, pokemons = pokeDetails) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }

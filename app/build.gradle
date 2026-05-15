@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.apollo.graphql)
 }
 
 android {
@@ -33,6 +34,17 @@ android {
 
 kotlin {
     jvmToolchain(17)
+}
+
+apollo {
+    service("service") {
+        packageName.set("br.com.pokebase")
+
+        introspection {
+            endpointUrl.set("https://graphql.pokeapi.co/v1beta2")
+            schemaFile.set(file("src/main/graphql/schema.graphqls"))
+        }
+    }
 }
 
 dependencies {
@@ -78,6 +90,7 @@ dependencies {
     implementation libs.retrofit
     implementation libs.retrofit.converter.gson
     implementation libs.okhttp.logging.interceptor
+    implementation libs.apollo.graphql
 
     // Coil 3
     implementation platform(libs.coil.bom)

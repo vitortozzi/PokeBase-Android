@@ -1,0 +1,15 @@
+query GetPokemonList($limit: Int!, $offset: Int!) {
+    pokemon(limit: $limit, offset: $offset) {
+        id
+        name
+        pokemontypes {
+            slot
+            type {
+                name
+            }
+        }
+        pokemonsprites {
+            sprites
+        }
+    }
+}

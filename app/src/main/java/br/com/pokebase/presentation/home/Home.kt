@@ -1,5 +1,7 @@
 package br.com.pokebase.presentation.home
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -45,46 +47,55 @@ fun HomeScreen(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        if (uiState.isLoading) {
-            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.pokeball_loading_animation))
-            LottieAnimation(
-                composition = composition,
-                iterations = LottieConstants.IterateForever,
-                modifier = Modifier
-                    .size(200.dp)
-                    .align(Alignment.Center)
-            )
-        } else if (uiState.errorMessage != null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = uiState.errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 24.dp)
+    AnimatedContent(
+        targetState = uiState,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(500)) togetherWith
+                    fadeOut(animationSpec = tween(500))
+        },
+        label = "HomeScreenTransition"
+    ) { targetState ->
+        Box(modifier = modifier.fillMaxSize()) {
+            if (targetState.isLoading) {
+                val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.pokeball_loading_animation))
+                LottieAnimation(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .align(Alignment.Center)
                 )
-                Button(
-                    onClick = onRetry
+            } else if (targetState.errorMessage != null) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Try Again")
+                    Text(
+                        text = targetState.errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+                    Button(
+                        onClick = onRetry
+                    ) {
+                        Text("Try Again")
+                    }
                 }
-            }
-        } else {
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(
-                    uiState.pokemons, key = {
-                        it.id
-                    }) { pokemon ->
-                    PokemonItem(pokemon)
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(
+                        targetState.pokemons, key = {
+                            it.id
+                        }) { pokemon ->
+                        PokemonItem(pokemon)
+                    }
                 }
             }
         }

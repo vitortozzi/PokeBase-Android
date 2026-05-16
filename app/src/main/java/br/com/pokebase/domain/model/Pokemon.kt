@@ -13,7 +13,8 @@ data class PokemonDetail(
     val id: Int,
     val name: String,
     val sprite: Sprite?,
-    val types: List<PokemonTypeItem>
+    val types: List<PokemonTypeItem>,
+    val isFavorite: Boolean = false
 )
 
 data class PokemonTypeItem(

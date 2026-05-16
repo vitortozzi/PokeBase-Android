@@ -2,6 +2,7 @@ package br.com.pokebase.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.com.pokebase.domain.FavoritePokemonUseCase
 import br.com.pokebase.domain.PokemonCatalogUseCase
 import br.com.pokebase.domain.model.PokemonDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ data class HomeUiState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val catalogUseCase: PokemonCatalogUseCase
+    private val catalogUseCase: PokemonCatalogUseCase,
+    private val favoriteUseCase: FavoritePokemonUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -40,6 +42,16 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }
+            }
+        }
+    }
+
+    fun favorite(pokemon: PokemonDetail, favorite: Boolean) {
+        viewModelScope.launch {
+            try {
+                favoriteUseCase.favoritePokemon(pokemon.id, favorite)
+            } catch (_: Exception) {
+                _uiState.update { it.copy(errorMessage = "Could not update favorite") }
             }
         }
     }

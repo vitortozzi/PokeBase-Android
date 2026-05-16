@@ -1,5 +1,6 @@
 package br.com.pokebase.data.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,5 +11,9 @@ data class PokemonEntity(
     val imageUrl: String?,
     val types: String,
     val lastUpdated: Long = System.currentTimeMillis()
-) {
-}
+)
+
+data class PokemonWithFavorite(
+    @Embedded val pokemonEntity: PokemonEntity,
+    val isFavorite: Boolean
+)

@@ -31,7 +31,7 @@ class PokemonCatalogRepositoryImpl @Inject constructor(
             fetchAndSavePokemons(limit, offset)
         }
 
-        return pokemonDao.getAll().map { entities ->
+        return pokemonDao.getAllWithFavorite().map { entities ->
             entities.map { it.toDomain() }
         }
     }

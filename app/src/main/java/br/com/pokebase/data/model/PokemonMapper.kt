@@ -25,7 +25,7 @@ fun SpriteOtherModel.toDomain() = SpriteOther(
 
 fun TypeEnumModel.toDomain() = TypeEnum.valueOf(this.name)
 
-fun PokemonEntity.toDomain() = PokemonDetail(
+fun PokemonEntity.toDomain(isFavorite: Boolean = false) = PokemonDetail(
     id = id,
     name = name,
     sprite = Sprite(
@@ -42,5 +42,8 @@ fun PokemonEntity.toDomain() = PokemonDetail(
                 url = ""
             )
         )
-    }
+    },
+    isFavorite = isFavorite
 )
+
+fun PokemonWithFavorite.toDomain() = pokemonEntity.toDomain(isFavorite = isFavorite)

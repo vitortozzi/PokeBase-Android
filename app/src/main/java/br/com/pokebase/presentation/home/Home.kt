@@ -1,32 +1,62 @@
 package br.com.pokebase.presentation.home
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import br.com.pokebase.R
 import br.com.pokebase.capitalizeName
 import br.com.pokebase.domain.model.PokemonDetail
+import br.com.pokebase.domain.model.PokemonType
 import br.com.pokebase.domain.model.PokemonTypeItem
+import br.com.pokebase.domain.model.Sprite
+import br.com.pokebase.domain.model.SpriteArtwork
+import br.com.pokebase.domain.model.SpriteOther
+import br.com.pokebase.domain.model.TypeEnum
 import coil3.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import br.com.pokebase.R
 
 @Composable
 fun HomeRoute(
@@ -36,7 +66,10 @@ fun HomeRoute(
     val uiState by viewModel.uiState.collectAsState()
     HomeScreen(
         uiState = uiState,
-        onRetry = {viewModel.loadCatalog()},
+        onRetry = { viewModel.loadCatalog() },
+        onFavoriteClick = { pokemon, isFavorite ->
+            viewModel.favorite(pokemon, isFavorite)
+        },
         modifier = modifier
     )
 }
@@ -45,6 +78,7 @@ fun HomeRoute(
 fun HomeScreen(
     uiState: HomeUiState,
     onRetry: () -> Unit,
+    onFavoriteClick: (PokemonDetail, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -52,6 +86,13 @@ fun HomeScreen(
         transitionSpec = {
             fadeIn(animationSpec = tween(500)) togetherWith
                     fadeOut(animationSpec = tween(500))
+        },
+        contentKey = { state ->
+            when {
+                state.isLoading -> 0
+                state.errorMessage != null -> 1
+                else -> 2
+            }
         },
         label = "HomeScreenTransition"
     ) { targetState ->
@@ -94,7 +135,10 @@ fun HomeScreen(
                         targetState.pokemons, key = {
                             it.id
                         }) { pokemon ->
-                        PokemonItem(pokemon)
+                        PokemonItem(
+                            pokemon = pokemon,
+                            onFavoriteClick = { onFavoriteClick(pokemon, it) }
+                        )
                     }
                 }
             }
@@ -103,7 +147,10 @@ fun HomeScreen(
 }
 
 @Composable
-fun PokemonItem(pokemon: PokemonDetail) {
+fun PokemonItem(
+    pokemon: PokemonDetail,
+    onFavoriteClick: (Boolean) -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
@@ -136,7 +183,7 @@ fun PokemonItem(pokemon: PokemonDetail) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "#${pokemon.id.toString().padStart(3, '0')}",
                     fontWeight = FontWeight.Bold,
@@ -156,6 +203,17 @@ fun PokemonItem(pokemon: PokemonDetail) {
                     }
                 }
             }
+
+            IconToggleButton(
+                checked = pokemon.isFavorite,
+                onCheckedChange = onFavoriteClick
+            ) {
+                Icon(
+                    imageVector = if (pokemon.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = if (pokemon.isFavorite) "Remove from favorites" else "Add to favorites",
+                    tint = if (pokemon.isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
@@ -172,5 +230,66 @@ fun TypeChip(typeItem: PokemonTypeItem) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSecondary
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PokemonItemPreview() {
+    val samplePokemon = PokemonDetail(
+        id = 1,
+        name = "bulbasaur",
+        sprite = Sprite(
+            frontDefault = null,
+            otherSprites = SpriteOther(
+                officialArtwork = SpriteArtwork(
+                    frontDefault = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+                )
+            )
+        ),
+        types = listOf(
+            PokemonTypeItem(1, PokemonType(TypeEnum.grass, "")),
+            PokemonTypeItem(2, PokemonType(TypeEnum.poison, ""))
+        )
+    )
+
+    MaterialTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            PokemonItem(
+                pokemon = samplePokemon,
+                onFavoriteClick = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PokemonItemFavoritePreview() {
+    val samplePokemon = PokemonDetail(
+        id = 1,
+        name = "bulbasaur",
+        sprite = Sprite(
+            frontDefault = null,
+            otherSprites = SpriteOther(
+                officialArtwork = SpriteArtwork(
+                    frontDefault = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+                )
+            )
+        ),
+        types = listOf(
+            PokemonTypeItem(1, PokemonType(TypeEnum.grass, "")),
+            PokemonTypeItem(2, PokemonType(TypeEnum.poison, ""))
+        ),
+        isFavorite = true
+    )
+
+    MaterialTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            PokemonItem(
+                pokemon = samplePokemon,
+                onFavoriteClick = {}
+            )
+        }
     }
 }

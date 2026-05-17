@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +41,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -86,67 +89,104 @@ fun HomeScreen(
     onFavoriteClick: (PokemonDetail, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AnimatedContent(
-        targetState = uiState,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(500)) togetherWith
-                    fadeOut(animationSpec = tween(500))
-        },
-        contentKey = { it::class },
-        label = "HomeScreenTransition"
-    ) { targetState ->
-        Box(modifier = modifier.fillMaxSize()) {
-            when (targetState) {
-                is HomeUiState.Loading -> {
-                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.pokeball_loading_animation))
-                    LottieAnimation(
-                        composition = composition,
-                        iterations = LottieConstants.IterateForever,
-                        modifier = Modifier
-                            .size(200.dp)
-                            .align(Alignment.Center)
-                    )
-                }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_pokemon_logo),
+            contentDescription = "Pokémon Logo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .padding(top = 16.dp, bottom = 8.dp),
+            contentScale = ContentScale.Fit
+        )
 
-                is HomeUiState.Error -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = targetState.message,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(bottom = 24.dp)
-                        )
-                        Button(
-                            onClick = onRetry
-                        ) {
-                            Text("Try Again")
-                        }
-                    }
-                }
-
-                is HomeUiState.Success -> {
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(
-                            targetState.pokemons, key = {
-                                it.id
-                            }) { pokemon ->
-                            PokemonItem(
-                                pokemon = pokemon,
-                                onFavoriteClick = { onFavoriteClick(pokemon, it) }
+        Box(modifier = Modifier.weight(1f)) {
+            AnimatedContent(
+                targetState = uiState,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(500)) togetherWith
+                            fadeOut(animationSpec = tween(500))
+                },
+                contentKey = { it::class },
+                label = "HomeScreenTransition"
+            ) { targetState ->
+                Box(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+                    when (targetState) {
+                        is HomeUiState.Loading -> {
+                            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.pokeball_loading_animation))
+                            LottieAnimation(
+                                composition = composition,
+                                iterations = LottieConstants.IterateForever,
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .align(Alignment.Center)
                             )
+                        }
+
+                        is HomeUiState.Error -> {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = targetState.message,
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(bottom = 24.dp)
+                                )
+                                Button(
+                                    onClick = onRetry
+                                ) {
+                                    Text("Try Again")
+                                }
+                            }
+                        }
+
+                        is HomeUiState.Success -> {
+                            LazyColumn(
+                                contentPadding = PaddingValues(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 8.dp,
+                                    bottom = 16.dp
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(
+                                    targetState.pokemons, key = {
+                                        it.id
+                                    }) { pokemon ->
+                                    PokemonItem(
+                                        pokemon = pokemon,
+                                        onFavoriteClick = { onFavoriteClick(pokemon, it) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.background,
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
         }
     }
 }

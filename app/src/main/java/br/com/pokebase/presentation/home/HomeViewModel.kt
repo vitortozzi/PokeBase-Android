@@ -13,19 +13,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class HomeUiState(
-    val isLoading: Boolean = false,
-    val pokemons: List<PokemonDetail> = emptyList(),
-    val errorMessage: String? = null
-)
-
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val catalogUseCase: PokemonCatalogUseCase,
     private val favoriteUseCase: FavoritePokemonUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
@@ -34,14 +28,14 @@ class HomeViewModel @Inject constructor(
 
     fun loadCatalog() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { HomeUiState.Loading }
             try {
-                //TODO: fixed offset and limit for tests purposes. Need to improve it
+                // TODO: fixed offset and limit for tests purposes. Need to improve it
                 catalogUseCase.getPokemonCatalog(151, 0).collect { pokemonList ->
-                    _uiState.update { it.copy(isLoading = false, pokemons = pokemonList) }
+                    _uiState.update { HomeUiState.Success(pokemonList) }
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }
+                _uiState.update { HomeUiState.Error(message = e.message ?: "Unknown error") }
             }
         }
     }
@@ -50,8 +44,11 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 favoriteUseCase.favoritePokemon(pokemon.id, favorite)
-            } catch (_: Exception) {
-                _uiState.update { it.copy(errorMessage = "Could not update favorite") }
+            } catch (e: Exception) {
+                // In this sealed state architecture, error messages for specific actions 
+                // could be handled via a separate Channel/Flow for "Events" (Snackbars, Toast).
+                // For now, we log the error as the main state change is reactive via DB.
+                e.printStackTrace()
             }
         }
     }

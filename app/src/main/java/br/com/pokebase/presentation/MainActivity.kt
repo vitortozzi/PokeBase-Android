@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import br.com.pokebase.R
-import br.com.pokebase.presentation.home.HomeRoute
+import br.com.pokebase.presentation.home.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -40,12 +40,13 @@ class MainActivity : ComponentActivity() {
 
 private sealed class Screen(val route: String, val labelRes: Int, val iconRes: Int) {
     object Home : Screen("home", R.string.title_pokedex, R.drawable.ic_pokedex)
+    object Favorite : Screen("favorite", R.string.title_favorite, iconRes = R.drawable.ic_favorite)
 }
 
 @Composable
 private fun MainScreen() {
     val navController = rememberNavController()
-    val items = listOf(Screen.Home)
+    val items = listOf(Screen.Home, Screen.Favorite)
 
     Scaffold(
         bottomBar = {
@@ -81,7 +82,8 @@ private fun MainScreen() {
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) { HomeRoute() }
+            composable(Screen.Home.route) { HomeScreen() }
+            composable(Screen.Favorite.route) { FavoritesScreen() }
         }
     }
 }

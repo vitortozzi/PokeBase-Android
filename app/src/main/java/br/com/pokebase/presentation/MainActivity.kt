@@ -22,7 +22,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import br.com.pokebase.R
-import br.com.pokebase.presentation.home.HomeScreen
+import br.com.pokebase.presentation.favorites.FavoritesRoute
+import br.com.pokebase.presentation.home.HomeRoute
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -82,8 +83,8 @@ private fun MainScreen() {
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) { HomeScreen() }
-            composable(Screen.Favorite.route) { FavoritesScreen() }
+            composable(Screen.Home.route) { HomeRoute() }
+            composable(Screen.Favorite.route) { FavoritesRoute() }
         }
     }
 }

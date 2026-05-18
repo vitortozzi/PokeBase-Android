@@ -6,7 +6,7 @@ import br.com.pokebase.data.model.PokemonEntity
 import br.com.pokebase.data.model.SpriteModel
 import br.com.pokebase.data.model.TypeEnumModel
 import br.com.pokebase.data.model.toDomain
-import br.com.pokebase.domain.PokemonCatalogRepository
+import br.com.pokebase.domain.repository.PokemonCatalogRepository
 import br.com.pokebase.domain.model.PokemonDetail
 import com.apollographql.apollo.ApolloClient
 import com.google.gson.Gson

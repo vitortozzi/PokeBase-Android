@@ -1,4 +1,4 @@
-package br.com.pokebase.domain
+package br.com.pokebase.domain.repository
 
 import br.com.pokebase.domain.model.PokemonDetail
 import kotlinx.coroutines.flow.Flow

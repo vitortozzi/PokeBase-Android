@@ -2,8 +2,8 @@ package br.com.pokebase.data.di
 
 import br.com.pokebase.data.repository.PokemonCatalogRepositoryImpl
 import br.com.pokebase.data.repository.PokemonFavoriteRepositoryImpl
-import br.com.pokebase.domain.PokemonCatalogRepository
-import br.com.pokebase.domain.PokemonFavoriteRepository
+import br.com.pokebase.domain.repository.PokemonCatalogRepository
+import br.com.pokebase.domain.repository.PokemonFavoriteRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

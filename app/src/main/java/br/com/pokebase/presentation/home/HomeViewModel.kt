@@ -2,8 +2,8 @@ package br.com.pokebase.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.pokebase.domain.FavoritePokemonUseCase
-import br.com.pokebase.domain.PokemonCatalogUseCase
+import br.com.pokebase.domain.usecase.FavoritePokemonUseCase
+import br.com.pokebase.domain.usecase.PokemonCatalogUseCase
 import br.com.pokebase.domain.model.PokemonDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

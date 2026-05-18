@@ -44,4 +44,12 @@ interface PokemonDao {
 
     @Query("DELETE FROM favorites WHERE pokemon_id = :pokemonId")
     suspend fun deleteFavorite(pokemonId: Int)
+    
+    @Query("""
+        SELECT p.*, (f.pokemon_id IS NOT NULL) AS isFavorite
+        FROM pokemon p
+        LEFT JOIN favorites f WHERE f.pokemon_id = p.id
+        ORDER BY f.pokemon_id
+    """)
+    fun getFavorites(): Flow<List<PokemonWithFavorite>>
 }

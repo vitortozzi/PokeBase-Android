@@ -21,6 +21,7 @@ PokéBase is a digital Pokédex that provides a rich, interactive experience for
 - **Efficient Data Fetching:** Utilizes **GraphQL** via **Apollo Kotlin** to fetch only the necessary data from the [PokeAPI](https://pokeapi.co/), significantly improving performance over traditional REST.
 - **Modern UI:** Built using **Jetpack Compose** for a declarative and responsive interface.
 - **Fluid Animations:** Integrated **Lottie** animations for an engaging "Pokéball" loading experience.
+- **Favorite System:** Bookmark your favorite Pokémon for quick access. The list is stored locally and updated in real-time using reactive Flow.
 - **Clean Architecture:** Separated into Data, Domain, and Presentation layers for maximum maintainability and testability.
 
 ---
